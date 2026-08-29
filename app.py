@@ -103,29 +103,45 @@ def ensure_environment_and_models():
     models_file = model_dir / "improved_models.joblib"
     train_file = config.TRAIN_FILE
 
-    if not train_file.exists() or not models_file.exists():
-        with st.spinner("🚀 First-Time Setup: Generating synthetic panel & training calibrated models (~12s)..."):
-            # Ensure directories
-            config.RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
-            config.PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
-            config.REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-            config.FIGURES_DIR.mkdir(parents=True, exist_ok=True)
-            config.SUBMISSION_DIR.mkdir(parents=True, exist_ok=True)
+    # Ensure all directories
+    config.RAW_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    config.PROCESSED_DATA_DIR.mkdir(parents=True, exist_ok=True)
+    config.REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+    config.FIGURES_DIR.mkdir(parents=True, exist_ok=True)
+    config.SUBMISSION_DIR.mkdir(parents=True, exist_ok=True)
 
+    try:
+        if not train_file.exists():
             from src.data.synthesize import generate_all
+            generate_all()
+
+        if not models_file.exists():
             from src.features.engineer import run_feature_engineering
             from src.models.improved import train_improved_models
             from src.anomaly.detector import run_anomaly_detection
             from src.submission import generate_submission
-
-            generate_all()
             run_feature_engineering()
             train_improved_models()
             run_anomaly_detection()
             generate_submission()
 
-    models = joblib.load(models_file)
-    feature_cols = joblib.load(model_dir / "feature_columns.joblib")
+        models = joblib.load(models_file)
+        feature_cols = joblib.load(model_dir / "feature_columns.joblib")
+    except Exception as e:
+        print(f"Self-healing bootloader triggered due to: {e}")
+        from src.data.synthesize import generate_all
+        from src.features.engineer import run_feature_engineering
+        from src.models.improved import train_improved_models
+        from src.anomaly.detector import run_anomaly_detection
+        from src.submission import generate_submission
+        generate_all()
+        run_feature_engineering()
+        train_improved_models()
+        run_anomaly_detection()
+        generate_submission()
+        models = joblib.load(models_file)
+        feature_cols = joblib.load(model_dir / "feature_columns.joblib")
+
     return models, feature_cols
 
 
@@ -148,10 +164,12 @@ def get_cached_anomaly_cases():
 
 
 @st.cache_resource(show_spinner=False)
-def get_shap_explainer(model):
-    """Cache TreeExplainer instance."""
+def get_default_shap_explainer():
+    """Cache TreeExplainer instance safely with zero unhashable parameters."""
     import shap
-    base_est = model
+    model_dir = config.PROJECT_ROOT / "checkpoints" / "improved"
+    models = joblib.load(model_dir / "improved_models.joblib")
+    base_est = models["next_12m_default_flag"]
     if hasattr(base_est, "calibrated_classifiers_"):
         base_est = base_est.calibrated_classifiers_[0].estimator
     return shap.TreeExplainer(base_est)
@@ -550,7 +568,7 @@ elif selected_module == "🤖 Grounded Reviewer Copilot":
         p_def = float(models["next_12m_default_flag"].predict_proba(X)[:, 1][0])
         p_prep = float(models["next_12m_prepayment_flag"].predict_proba(X)[:, 1][0])
 
-        explainer = get_shap_explainer(models["next_12m_default_flag"])
+        explainer = get_default_shap_explainer()
         shap_vals = explainer.shap_values(X)[0]
         shap_dict = {feature_cols[i]: float(shap_vals[i]) for i in range(len(feature_cols))}
 
