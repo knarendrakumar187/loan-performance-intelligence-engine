@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Added
+- Task 4 Anomaly & Exception Detection Report (`reports/anomaly_report.md`) featuring 25 reviewer-ready case studies with diagnostic plain-English reasoning and remediation prescriptions
+- Hybrid anomaly detection module (`src/anomaly/`) combining 10 deterministic validation rules, servicer tape conflict cross-matching, unsupervised Isolation Forest spatial density scoring, and Random Forest exception classifier
 - Task 3 Time-to-Event & Survival Modeling Report (`reports/survival_report.md`) detailing competing risks (default vs prepayment), Kaplan-Meier stratification by credit and vintage, Cox PH hazard ratios, and exponential/Weibull baseline comparisons
 - Survival modeling engine (`src/survival/competing_risks.py`) and naive baseline hazard benchmarks (`src/survival/baseline_hazard.py`)
 - Task 2 Model Performance & Comparison Report (`reports/model_comparison.md`) with comprehensive evaluation table across 5 targets (ROC-AUC, PR-AUC, F1, Brier, Recall@80% precision) and calibration reliability analysis

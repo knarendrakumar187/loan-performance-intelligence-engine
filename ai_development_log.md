@@ -185,6 +185,38 @@ Implement the complete survival modeling suite for Task 3 (15 pts):
 ### Lessons Learned
 - Prepayment represents a major competing absorbing event in mortgage panels; failing to model competing risks leads to statistically biased risk estimates.
 
+---
+
+## Session 6 — Task 4: Anomaly & Exception Detection (2026-08-29)
+
+### AI Tool Used
+- **Model:** Gemini 3.7 Flash
+- **Purpose:** Deterministic business rule validation, servicer secondary tape cross-matching, unsupervised Isolation Forest spatial density modeling, supervised Random Forest exception classification, plain-English diagnostic driver generation, and markdown reporting.
+
+### Representative Prompt
+```
+Build the complete anomaly and exception detection engine for Task 4 (10 pts):
+- Combine 10 deterministic validation rules with an unsupervised Isolation Forest score
+- Predict exception_type (data_entry_error, stale_record, source_conflict, suspicious_transition, none)
+- Produce >= 20 reviewer-ready anomaly case studies with plain-English diagnostic reasoning and remediation actions
+- Output reports/anomaly_report.md
+```
+
+### What Was Accepted
+- Hybrid composite score formulation: $0.45 \times \text{rule\_score} + 0.55 \times \text{isolation\_forest\_score}$.
+- Generation of 25 detailed reviewer-ready anomaly case studies with individual loan IDs, reporting months, anomaly scores, triggered rules, plain-English diagnostic explanations, and prescribed servicer remediations.
+- Automated servicer dual-source reconciliation against `servicer_updates.csv`.
+
+### What Was Rejected / Modified
+- Rejected pure rule-based thresholding in favor of hybrid rule + ML scoring to capture subtle multivariate balance anomalies that individual threshold rules miss.
+
+### Approximate AI-Generated Code Share
+- ~92% AI-generated, 8% human underwriting policy calibration
+
+### Lessons Learned
+- Rule-based systems excel at catching explicit accounting violations (e.g. negative balances), while Isolation Forests detect multivariate distributional outliers; combining them provides superior coverage.
+
+
 
 
 
