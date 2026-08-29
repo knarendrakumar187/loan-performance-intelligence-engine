@@ -42,3 +42,39 @@ matching the exact schemas from the problem statement.
 ### Lessons Learned
 - Starting with a detailed implementation plan before any code prevents wasted commits
 - Pinning dependency versions from the start avoids reproducibility issues later
+
+---
+
+## Session 2 — Synthetic Data & Environment Setup (2026-08-29)
+
+### AI Tool Used
+- **Model:** Gemini 3.7 Flash
+- **Purpose:** Dependency resolution, synthetic data generator optimization, schema validation
+
+### Representative Prompt
+```
+Generate synthetic datasets matching the exact problem statement schemas:
+- loan_monthly_performance_train.csv
+- loan_monthly_performance_test.csv
+- loan_static_attributes.csv
+- servicer_updates.csv
+- macro_scenarios.csv
+- data_dictionary.md
+- validation_rules.json
+```
+
+### What Was Accepted
+- Vectorized target computation and deliberate anomaly injection (sub-10s generation for 34k+ records)
+- Time-aware 80/20 train/test cohort split by cumulative reporting month
+- Comprehensive data dictionary and validation rules covering 10 business logic checks
+
+### What Was Rejected / Modified
+- Rejected row-by-row `df.loc` loops in favor of vectorized numpy indexing for instant dataset generation
+- Adjusted calendar observation window to 2022-2024 to create realistic seasoning curves across 24 origination cohorts
+
+### Approximate AI-Generated Code Share
+- ~90% AI-generated, 10% human architectural and schema oversight
+
+### Lessons Learned
+- Computing forward-looking target flags directly during per-loan history simulation is mathematically leakage-free and orders of magnitude faster than post-hoc dataframe grouping.
+

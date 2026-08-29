@@ -100,8 +100,10 @@ def _generate_loan_static(rng: np.random.Generator, n_loans: int) -> pd.DataFram
     records = []
     for i in range(n_loans):
         loan_id = f"LN{i:06d}"
-        orig_month_offset = rng.integers(0, 12)  # Origination spread over 12 months
-        origination_month = f"2023-{orig_month_offset + 1:02d}"
+        orig_month_offset = rng.integers(0, 24)  # Origination spread over 24 months (2022-01 to 2023-12)
+        orig_year = 2022 + orig_month_offset // 12
+        orig_m = (orig_month_offset % 12) + 1
+        origination_month = f"{orig_year}-{orig_m:02d}"
 
         credit_band = rng.choice(config.CREDIT_SCORE_BANDS, p=credit_weights)
         ltv_band = rng.choice(config.LTV_BANDS, p=ltv_weights)
@@ -221,123 +223,98 @@ def _simulate_loan_history(
         # Transition to next state
         current_status_idx = rng.choice(6, p=trans_mat[current_status_idx])
 
+    # Compute forward-looking targets directly on records (leakage-free by construction)
+    n_rec = len(records)
+    for i in range(n_rec):
+        future_statuses = [records[j]["current_status"] for j in range(i + 1, min(i + 13, n_rec))]
+        
+        # next_3m_delinquency_flag
+        f3 = future_statuses[:3]
+        records[i]["next_3m_delinquency_flag"] = (
+            int(any(s in ("30DPD", "60DPD", "90DPD", "Default") for s in f3))
+            if len(f3) > 0 else np.nan
+        )
+
+        # next_6m_delinquency_flag
+        f6 = future_statuses[:6]
+        records[i]["next_6m_delinquency_flag"] = (
+            int(any(s in ("30DPD", "60DPD", "90DPD", "Default") for s in f6))
+            if len(f6) > 0 else np.nan
+        )
+
+        # next_12m_default_flag
+        f12 = future_statuses[:12]
+        records[i]["next_12m_default_flag"] = (
+            int(any(s == "Default" for s in f12))
+            if len(f12) > 0 else np.nan
+        )
+
+        # next_12m_prepayment_flag
+        records[i]["next_12m_prepayment_flag"] = (
+            int(any(s == "Prepaid" for s in f12))
+            if len(f12) > 0 else np.nan
+        )
+
+        # next_state
+        records[i]["next_state"] = records[i + 1]["current_status"] if i + 1 < n_rec else None
+
+        # exception flags (default)
+        records[i]["exception_required"] = 0
+        records[i]["exception_type"] = "none"
+
     return records
 
 
 def _compute_targets(df: pd.DataFrame) -> pd.DataFrame:
-    """Compute forward-looking target variables from loan history.
-
-    CRITICAL: Targets are computed from FUTURE states, not current features.
-    This is the leakage-free construction guaranteed by design.
-    """
-    df = df.sort_values(["loan_id", "month_index"]).copy()
-
-    # Initialize targets
-    for col in config.TARGET_COLUMNS:
-        df[col] = np.nan
-
-    # Group by loan and compute forward-looking targets
-    for loan_id, group in df.groupby("loan_id"):
-        idx = group.index
-        statuses = group["current_status"].values
-        n = len(statuses)
-
-        for i in range(n):
-            row_idx = idx[i]
-
-            # next_3m_delinquency_flag: any delinquency in next 3 months
-            future_3m = statuses[i + 1: i + 4]
-            if len(future_3m) > 0:
-                df.loc[row_idx, "next_3m_delinquency_flag"] = int(
-                    any(s in ("30DPD", "60DPD", "90DPD", "Default") for s in future_3m)
-                )
-
-            # next_6m_delinquency_flag: any delinquency in next 6 months
-            future_6m = statuses[i + 1: i + 7]
-            if len(future_6m) > 0:
-                df.loc[row_idx, "next_6m_delinquency_flag"] = int(
-                    any(s in ("30DPD", "60DPD", "90DPD", "Default") for s in future_6m)
-                )
-
-            # next_12m_default_flag: any default in next 12 months
-            future_12m = statuses[i + 1: i + 13]
-            if len(future_12m) > 0:
-                df.loc[row_idx, "next_12m_default_flag"] = int(
-                    any(s == "Default" for s in future_12m)
-                )
-
-            # next_12m_prepayment_flag: any prepayment in next 12 months
-            if len(future_12m) > 0:
-                df.loc[row_idx, "next_12m_prepayment_flag"] = int(
-                    any(s == "Prepaid" for s in future_12m)
-                )
-
-            # next_state: status at month i+1
-            if i + 1 < n:
-                df.loc[row_idx, "next_state"] = statuses[i + 1]
-
-            # exception_required and exception_type (rule-based anomalies)
-            df.loc[row_idx, "exception_required"] = 0
-            df.loc[row_idx, "exception_type"] = "none"
-
+    """Pass-through since targets are computed during simulation."""
     return df
 
 
 def _inject_data_quality_issues(
     df: pd.DataFrame, rng: np.random.Generator, rate: float = 0.05
 ) -> pd.DataFrame:
-    """Inject deliberate data quality issues for anomaly detection testing.
-
-    Issues injected:
-    - Missing values (~5% in selected columns)
-    - Outlier balances (balance > 2x original or negative)
-    - Invalid date relationships
-    - Status/DPD inconsistencies
-    - Source system conflicts
-    """
+    """Inject deliberate data quality issues for anomaly detection testing."""
     n = len(df)
     n_issues = int(n * rate)
 
     # 1. Missing values in selected columns
-    missing_cols = ["credit_score_band", "ltv_band", "dti_band",
-                    "interest_rate", "current_balance"]
+    missing_cols = ["credit_score_band", "ltv_band", "dti_band", "interest_rate", "current_balance"]
     for col in missing_cols:
         missing_idx = rng.choice(n, size=int(n * rate * 0.5), replace=False)
-        df.loc[df.index[missing_idx], col] = np.nan
+        df.iloc[missing_idx, df.columns.get_loc(col)] = np.nan
 
     # 2. Outlier balances (balance > original or negative)
     outlier_idx = rng.choice(n, size=n_issues // 3, replace=False)
-    for idx in outlier_idx:
-        if rng.random() < 0.5:
-            # Balance exceeds original
-            df.loc[df.index[idx], "current_balance"] = (
-                df.loc[df.index[idx], "original_balance"] * rng.uniform(1.1, 2.5)
-            )
-        else:
-            # Negative balance
-            df.loc[df.index[idx], "current_balance"] = -abs(
-                df.loc[df.index[idx], "current_balance"]
-            )
-        # Mark as anomaly
-        df.loc[df.index[idx], "exception_required"] = 1
-        df.loc[df.index[idx], "exception_type"] = "data_entry_error"
+    split_pt = len(outlier_idx) // 2
+    idx_high = outlier_idx[:split_pt]
+    idx_neg = outlier_idx[split_pt:]
+
+    orig_bal = df["original_balance"].iloc[idx_high].values
+    curr_bal_col = df.columns.get_loc("current_balance")
+    df.iloc[idx_high, curr_bal_col] = orig_bal * rng.uniform(1.1, 2.5, size=len(idx_high))
+
+    curr_bal = df["current_balance"].iloc[idx_neg].values
+    df.iloc[idx_neg, curr_bal_col] = -np.abs(curr_bal)
+
+    df.iloc[outlier_idx, df.columns.get_loc("exception_required")] = 1
+    df.iloc[outlier_idx, df.columns.get_loc("exception_type")] = "data_entry_error"
 
     # 3. Status/DPD inconsistency (e.g., Current with DPD=60)
-    inconsist_idx = rng.choice(n, size=n_issues // 4, replace=False)
-    for idx in inconsist_idx:
-        status = df.loc[df.index[idx], "current_status"]
-        if status == "Current":
-            df.loc[df.index[idx], "days_past_due"] = rng.choice([30, 60, 90])
-            df.loc[df.index[idx], "exception_required"] = 1
-            df.loc[df.index[idx], "exception_type"] = "suspicious_transition"
+    current_mask = np.where(df["current_status"].values == "Current")[0]
+    if len(current_mask) > 0:
+        inconsist_size = min(len(current_mask), n_issues // 4)
+        inconsist_idx = rng.choice(current_mask, size=inconsist_size, replace=False)
+        dpd_col = df.columns.get_loc("days_past_due")
+        df.iloc[inconsist_idx, dpd_col] = rng.choice([30, 60, 90], size=inconsist_size)
+        df.iloc[inconsist_idx, df.columns.get_loc("exception_required")] = 1
+        df.iloc[inconsist_idx, df.columns.get_loc("exception_type")] = "suspicious_transition"
 
-    # 4. Stale records (last_updated_at far in the past)
+    # 4. Stale records
     stale_idx = rng.choice(n, size=n_issues // 5, replace=False)
-    for idx in stale_idx:
-        df.loc[df.index[idx], "last_updated_at"] = "2020-01-15"
-        df.loc[df.index[idx], "document_status"] = "Stale"
-        df.loc[df.index[idx], "exception_required"] = 1
-        df.loc[df.index[idx], "exception_type"] = "stale_record"
+    df.iloc[stale_idx, df.columns.get_loc("last_updated_at")] = "2020-01-15"
+    df.iloc[stale_idx, df.columns.get_loc("document_status")] = "Stale"
+    df.iloc[stale_idx, df.columns.get_loc("exception_required")] = 1
+    df.iloc[stale_idx, df.columns.get_loc("exception_type")] = "stale_record"
 
     return df
 
@@ -351,29 +328,30 @@ def _generate_servicer_updates(
     updates = df.iloc[sample_idx][
         ["loan_id", "month_index", "current_balance", "current_status",
          "days_past_due", "servicer_name"]
-    ].copy()
+    ].copy().reset_index(drop=True)
 
-    # Introduce conflicts (~20% of records)
     n_conflicts = int(n_updates * 0.20)
     conflict_idx = rng.choice(n_updates, size=n_conflicts, replace=False)
 
-    for idx in conflict_idx:
-        row_idx = updates.index[idx]
-        conflict_type = rng.choice(["balance", "status", "dpd"])
+    # Balance conflicts
+    c_bal = conflict_idx[:n_conflicts // 3]
+    bal_vals = updates["current_balance"].iloc[c_bal].values
+    updates.iloc[c_bal, updates.columns.get_loc("current_balance")] = bal_vals * rng.uniform(0.8, 1.2, size=len(c_bal))
 
-        if conflict_type == "balance":
-            updates.loc[row_idx, "current_balance"] *= rng.uniform(0.8, 1.2)
-        elif conflict_type == "status":
-            updates.loc[row_idx, "current_status"] = rng.choice(config.LOAN_STATUSES[:4])
-        else:
-            updates.loc[row_idx, "days_past_due"] = rng.choice([0, 30, 60, 90])
+    # Status conflicts
+    c_stat = conflict_idx[n_conflicts // 3: 2 * n_conflicts // 3]
+    updates.iloc[c_stat, updates.columns.get_loc("current_status")] = rng.choice(config.LOAN_STATUSES[:4], size=len(c_stat))
+
+    # DPD conflicts
+    c_dpd = conflict_idx[2 * n_conflicts // 3:]
+    updates.iloc[c_dpd, updates.columns.get_loc("days_past_due")] = rng.choice([0, 30, 60, 90], size=len(c_dpd))
 
     updates["source_system"] = "SystemB"
     updates["update_timestamp"] = "2024-06-15"
     updates["is_conflict"] = 0
-    updates.loc[updates.index[conflict_idx], "is_conflict"] = 1
+    updates.iloc[conflict_idx, updates.columns.get_loc("is_conflict")] = 1
 
-    return updates.reset_index(drop=True)
+    return updates
 
 
 def _generate_macro_scenarios() -> pd.DataFrame:
@@ -586,10 +564,10 @@ def generate_all():
     # 2. Simulate monthly histories
     print("  Simulating monthly loan histories...")
     all_records = []
-    max_months = 30  # Max observation window
+    max_months = 36  # Max observation window
     for _, loan in static_df.iterrows():
-        # Random observation length (12-30 months)
-        n_months = rng.integers(12, max_months + 1)
+        # Random observation length (18-36 months)
+        n_months = rng.integers(18, max_months + 1)
         history = _simulate_loan_history(rng, loan, n_months)
         all_records.extend(history)
 
@@ -604,11 +582,12 @@ def generate_all():
     print("  Injecting data quality issues for anomaly detection...")
     panel_df = _inject_data_quality_issues(panel_df, rng)
 
-    # 5. Split into train / test
+    # 5. Split into train / test (Time-aware split)
     # Train: has target labels; Test: targets removed
-    # Use last 20% of reporting months as test
-    all_months = sorted(panel_df["reporting_month"].unique())
-    test_cutoff = all_months[int(len(all_months) * 0.80)]
+    # Cutoff where ~80% of records fall chronologically
+    month_counts = panel_df["reporting_month"].value_counts().sort_index()
+    cum_counts = month_counts.cumsum() / len(panel_df)
+    test_cutoff = cum_counts[cum_counts >= 0.80].index[0]
     train_mask = panel_df["reporting_month"] < test_cutoff
     test_mask = ~train_mask
 

@@ -1,0 +1,86 @@
+{
+  "version": "1.0",
+  "description": "Deterministic validation rules for loan performance data",
+  "rules": [
+    {
+      "id": "R001",
+      "name": "balance_exceeds_original",
+      "description": "Current balance should not exceed original balance (unless modification)",
+      "condition": "current_balance > original_balance AND modification_flag == 0",
+      "severity": "high",
+      "exception_type": "data_entry_error"
+    },
+    {
+      "id": "R002",
+      "name": "negative_balance",
+      "description": "Current balance should not be negative",
+      "condition": "current_balance < 0",
+      "severity": "critical",
+      "exception_type": "data_entry_error"
+    },
+    {
+      "id": "R003",
+      "name": "dpd_status_mismatch",
+      "description": "Days past due should be consistent with current status",
+      "condition": "(current_status == 'Current' AND days_past_due > 0) OR (current_status == '30DPD' AND days_past_due != 30)",
+      "severity": "high",
+      "exception_type": "suspicious_transition"
+    },
+    {
+      "id": "R004",
+      "name": "negative_remaining_term",
+      "description": "Remaining term should not be negative",
+      "condition": "remaining_term_months < 0",
+      "severity": "medium",
+      "exception_type": "data_entry_error"
+    },
+    {
+      "id": "R005",
+      "name": "future_origination",
+      "description": "Origination date should not be after reporting date",
+      "condition": "origination_month > reporting_month",
+      "severity": "critical",
+      "exception_type": "data_entry_error"
+    },
+    {
+      "id": "R006",
+      "name": "closed_with_balance",
+      "description": "Prepaid or defaulted loans should have zero or near-zero balance",
+      "condition": "(current_status IN ('Prepaid') AND current_balance > 1000)",
+      "severity": "high",
+      "exception_type": "data_entry_error"
+    },
+    {
+      "id": "R007",
+      "name": "stale_update",
+      "description": "Last updated date is more than 6 months before reporting month",
+      "condition": "months_between(last_updated_at, reporting_month) > 6",
+      "severity": "medium",
+      "exception_type": "stale_record"
+    },
+    {
+      "id": "R008",
+      "name": "missing_documentation",
+      "description": "Active loans should not have missing documentation",
+      "condition": "current_status NOT IN ('Default', 'Prepaid') AND document_status == 'Missing'",
+      "severity": "medium",
+      "exception_type": "stale_record"
+    },
+    {
+      "id": "R009",
+      "name": "source_conflict",
+      "description": "Balance or status differs between primary and servicer systems",
+      "condition": "abs(primary_balance - servicer_balance) / primary_balance > 0.05",
+      "severity": "high",
+      "exception_type": "source_conflict"
+    },
+    {
+      "id": "R010",
+      "name": "impossible_transition",
+      "description": "Loan should not transition from Default/Prepaid back to Current",
+      "condition": "previous_status IN ('Default', 'Prepaid') AND current_status == 'Current'",
+      "severity": "critical",
+      "exception_type": "suspicious_transition"
+    }
+  ]
+}

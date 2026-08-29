@@ -38,8 +38,8 @@ RANDOM_SEED = 42
 # ──────────────────────────────────────────────
 # Synthetic data parameters
 # ──────────────────────────────────────────────
-SYNTH_NUM_LOANS = 2000
-SYNTH_AVG_MONTHS = 25
+SYNTH_NUM_LOANS = 3000
+SYNTH_AVG_MONTHS = 24
 SYNTH_TARGET_ROWS = 50_000
 
 # ──────────────────────────────────────────────
