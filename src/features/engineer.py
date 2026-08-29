@@ -40,6 +40,7 @@ def engineer_features(df: pd.DataFrame, is_train: bool = True) -> pd.DataFrame:
     df["ltv_risk_tier"] = df["ltv_band"].map(LTV_TIER_MAP).fillna(3).astype(int)
     df["dti_risk_tier"] = df["dti_band"].map(DTI_TIER_MAP).fillna(3).astype(int)
     df["combined_risk_index"] = df["ltv_risk_tier"] + df["dti_risk_tier"] + df["credit_risk_tier"]
+    df = df.drop(columns=["credit_score_band", "ltv_band", "dti_band"], errors="ignore")
 
     # 3. Delinquency Indicators
     if "days_past_due" in df.columns:

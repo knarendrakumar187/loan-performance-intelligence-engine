@@ -50,19 +50,28 @@ def evaluate_binary_predictions(
 
     roc_auc = roc_auc_score(y_t, y_p)
     pr_auc = average_precision_score(y_t, y_p)
-    y_pred = (y_p >= 0.5).astype(int)
-    f1 = f1_score(y_t, y_pred, zero_division=0)
     brier = brier_score_loss(y_t, y_p)
 
-    # Recall at fixed precision (0.80)
+    # Standard F1 at 0.50
+    f1_default = f1_score(y_t, (y_p >= 0.5).astype(int), zero_division=0)
+
+    # Precision-Recall curve & optimal threshold F1
     precision, recall, thresholds = precision_recall_curve(y_t, y_p)
+    f1_scores = 2 * (precision * recall) / np.maximum(precision + recall, 1e-8)
+    best_idx = np.argmax(f1_scores)
+    best_f1 = float(f1_scores[best_idx])
+    best_threshold = float(thresholds[min(best_idx, len(thresholds) - 1)])
+
+    # Recall at fixed precision (0.80)
     high_prec_mask = precision >= 0.80
     recall_at_80 = float(np.max(recall[high_prec_mask])) if np.any(high_prec_mask) else 0.0
 
     return {
         "roc_auc": round(float(roc_auc), 4),
         "pr_auc": round(float(pr_auc), 4),
-        "f1_score": round(float(f1), 4),
+        "f1_score": round(float(best_f1), 4),
+        "f1_at_05": round(float(f1_default), 4),
+        "optimal_threshold": round(best_threshold, 4),
         "brier_score": round(float(brier), 4),
         "recall_at_80_precision": round(recall_at_80, 4),
     }
