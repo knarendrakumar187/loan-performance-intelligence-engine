@@ -152,5 +152,39 @@ Build the complete predictive modeling pipeline for Task 2 (20 pts):
 ### Lessons Learned
 - Default prediction in financial panels benefits disproportionately from non-linear interaction terms and Platt calibration, reducing Brier calibration error by over 43% relative to uncalibrated baselines.
 
+---
+
+## Session 5 — Task 3: Time-to-Event / Survival Modeling (2026-08-29)
+
+### AI Tool Used
+- **Model:** Gemini 3.7 Flash
+- **Purpose:** Time-to-event aggregation, competing risks Cumulative Incidence Functions (CIF), Kaplan-Meier curve stratification, Cox Proportional Hazards regression, and baseline parametric hazard benchmarking.
+
+### Representative Prompt
+```
+Implement the complete survival modeling suite for Task 3 (15 pts):
+- Competing risks model (Default vs Prepayment vs Right-Censoring)
+- Kaplan-Meier curves stratified by credit band (Prime vs Subprime) and origination vintage
+- Statistical significance testing via Log-Rank test
+- Cox PH hazard ratios for key covariates (is_prime, interest_rate, original_balance)
+- Naive baseline comparison (Constant Hazard exponential vs Weibull vs Cox PH)
+- Save figures and generate reports/survival_report.md
+```
+
+### What Was Accepted
+- Competing risks formulation modeling voluntary prepayment (55.7%) alongside involuntary default (12.6%) to prevent biased single-risk default overestimation.
+- Stratification revealing extreme divergence between Prime and Subprime default-free survival ($p = 2.8271 \times 10^{-13}$).
+- Parametric comparisons showing 149.8 AIC point superiority for Weibull over memoryless constant hazard.
+
+### What Was Rejected / Modified
+- Rejected single-risk Kaplan-Meier modeling where prepayments are treated as non-informative censoring, replacing it with dual Cumulative Incidence Functions.
+
+### Approximate AI-Generated Code Share
+- ~90% AI-generated, 10% human statistical verification
+
+### Lessons Learned
+- Prepayment represents a major competing absorbing event in mortgage panels; failing to model competing risks leads to statistically biased risk estimates.
+
+
 
 

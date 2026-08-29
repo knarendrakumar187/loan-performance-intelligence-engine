@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Added
+- Task 3 Time-to-Event & Survival Modeling Report (`reports/survival_report.md`) detailing competing risks (default vs prepayment), Kaplan-Meier stratification by credit and vintage, Cox PH hazard ratios, and exponential/Weibull baseline comparisons
+- Survival modeling engine (`src/survival/competing_risks.py`) and naive baseline hazard benchmarks (`src/survival/baseline_hazard.py`)
 - Task 2 Model Performance & Comparison Report (`reports/model_comparison.md`) with comprehensive evaluation table across 5 targets (ROC-AUC, PR-AUC, F1, Brier, Recall@80% precision) and calibration reliability analysis
 - Improved gradient boosted models (`src/models/improved.py`) using calibrated XGBoost with `scale_pos_weight` and LightGBM multiclass transition models achieving 0.8168 ROC-AUC on 12M default and 0.7119 on prepayment
 - Baseline linear models (`src/models/baseline.py`) with StandardScaler pipelines
