@@ -32,11 +32,8 @@ data/processed/*.parquet
 
 # OS
 .DS_Store
-Thumbs.db
-
-# Reports - keep markdown, ignore generated assets selectively
-reports/figures/*.png
-reports/figures/*.jpg
+# Reports - track all markdown and figures
+# figures are tracked for Streamlit Cloud and reports
 
 # Logs
 *.log
