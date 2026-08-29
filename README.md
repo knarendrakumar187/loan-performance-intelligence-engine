@@ -1,6 +1,5 @@
 # Loan Performance Intelligence Engine (LPIE)
 
-[![Challenge](https://img.shields.io/badge/Competition-FinTech%20Campus%20FinTech%20Challenge%202026-blue.svg)](https://github.com/knarendrakumar187/loan-performance-intelligence-engine)
 [![Track](https://img.shields.io/badge/Track-AI%20Track-orange.svg)](https://github.com/knarendrakumar187/loan-performance-intelligence-engine)
 [![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12%20%7C%203.13-brightgreen.svg)](https://python.org)
 [![Status](https://img.shields.io/badge/Status-Complete%20(100%2F100%20pts)-success.svg)](https://github.com/knarendrakumar187/loan-performance-intelligence-engine)
