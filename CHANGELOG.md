@@ -6,6 +6,8 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Added
+- Task 5 Macroeconomic Scenario & Stress Simulation Report (`reports/scenario_report.md`) with portfolio and segment-level (credit band, vintage, state) default and prepayment projections across Base, Adverse Credit, and High Prepayment regimes
+- Macroeconomic scenario simulation engine (`src/scenario/simulator.py`) and comparative stress visualization
 - Task 4 Anomaly & Exception Detection Report (`reports/anomaly_report.md`) featuring 25 reviewer-ready case studies with diagnostic plain-English reasoning and remediation prescriptions
 - Hybrid anomaly detection module (`src/anomaly/`) combining 10 deterministic validation rules, servicer tape conflict cross-matching, unsupervised Isolation Forest spatial density scoring, and Random Forest exception classifier
 - Task 3 Time-to-Event & Survival Modeling Report (`reports/survival_report.md`) detailing competing risks (default vs prepayment), Kaplan-Meier stratification by credit and vintage, Cox PH hazard ratios, and exponential/Weibull baseline comparisons

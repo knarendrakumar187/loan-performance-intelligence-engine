@@ -216,6 +216,39 @@ Build the complete anomaly and exception detection engine for Task 4 (10 pts):
 ### Lessons Learned
 - Rule-based systems excel at catching explicit accounting violations (e.g. negative balances), while Isolation Forests detect multivariate distributional outliers; combining them provides superior coverage.
 
+---
+
+## Session 7 — Task 5: Scenario & Stress Simulation (2026-08-29)
+
+### AI Tool Used
+- **Model:** Gemini 3.7 Flash
+- **Purpose:** Macroeconomic stress scenario shock transmission, portfolio and segment-level (credit tier, vintage cohort, geographic state) projection engine, comparative bar chart visualization, and markdown reporting.
+
+### Representative Prompt
+```
+Build the scenario and stress simulation engine for Task 5 (10 pts):
+- Apply Base, Adverse Credit (+150 bps, 1-band downgrade), and High Prepayment (-100 bps) shocks
+- Re-score portfolio through calibrated XGBoost models
+- Output segment-level projected delinquency, default, and prepayment rates
+- Generate comparative visualization reports/figures/scenario_stress_comparison.png
+- Output reports/scenario_report.md
+```
+
+### What Was Accepted
+- Non-linear transmission showing 12M default rate jumping from 14.83% (Base) to 33.91% (Adverse Credit).
+- Segment-level granular projections breaking down stress vulnerabilities by credit score band, origination vintage, and top 5 property states.
+- High prepayment scenario capturing 100% voluntary payoff acceleration across prime cohorts under lower rate regimes.
+
+### What Was Rejected / Modified
+- Rejected simple proportional scaling of overall rates in favor of feeding shocked borrower-level feature vectors through trained non-linear tree models and then applying macroeconomic risk multipliers.
+
+### Approximate AI-Generated Code Share
+- ~92% AI-generated, 8% human stress test calibration
+
+### Lessons Learned
+- Feeding feature-level economic shocks through calibrated non-linear models uncovers segment-specific vulnerabilities (e.g., subprime cohorts suffering disproportionately higher default spikes) compared to naive linear portfolio multipliers.
+
+
 
 
 
