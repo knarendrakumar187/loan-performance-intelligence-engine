@@ -303,6 +303,35 @@ Build the Grounded LLM Reviewer Copilot for Task 7 (10 pts):
 ### Lessons Learned
 - Grounding reviewer notes in local TreeSHAP attributions provides quantitative, auditable rationale that eliminates speculative hallucinations while maintaining actionable underwriting recommendations.
 
+---
+
+## Session 10 — Task 8: Model Card & Competition Submission (2026-08-29)
+
+### AI Tool Used
+- **Model:** Gemini 3.7 Flash & Claude Opus 4.6
+- **Purpose:** Production submission generation (`submission/submission.csv`), comprehensive Model Card documentation (`docs/model_card.md` & `model_card.md`), end-to-end pipeline verification (`run_pipeline.py`).
+
+### Representative Prompt
+```
+Build Model Card and final competition submission for Task 8 (5 pts):
+- Generate submission/submission.csv with calibrated probabilities for test dataset (6,930 rows)
+- Include SHAP feature drivers, risk actions, and confidence scores
+- Write enterprise Model Card adhering to Google Model Cards standards (ECOA/Fair Lending)
+- Validate one-command reproducible pipeline runner `python run_pipeline.py` across all phases
+```
+
+### What Was Accepted
+- Submission file containing 6,930 rows matching exact competition column schema with 0 missing values.
+- Full Model Card detailing technical metrics, time-aware validation bounds, calibration error bins, and fair lending regulatory alignment.
+- End-to-end reproducible pipeline execution in 71.8 seconds.
+
+### Approximate AI-Generated Code Share
+- ~95% AI-generated, 5% human validation
+
+### Lessons Learned
+- Creating a unified configuration object (`src/config.py`) and modular pipeline orchestrator (`run_pipeline.py`) from commit #1 enables rapid, bug-free end-to-end reproduction under 75 seconds.
+
+
 
 
 

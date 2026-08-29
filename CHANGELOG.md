@@ -3,14 +3,20 @@
 All notable changes to this project will be documented in this file.
 Format based on [Keep a Changelog](https://keepachangelog.com/).
 
-## [Unreleased]
+## [1.0.0] - 2026-08-29
 
 ### Added
-- Task 7 Grounded LLM Reviewer Copilot Report (`reports/copilot_report.md`) with deterministic structured note generator grounded strictly in Data Dictionary, TreeSHAP values, and model confidence, alongside `prompt_log.jsonl` audit trail and 3 rejection/correction examples
-- Copilot module (`src/copilot/reviewer.py`) enforcing hallucination guardrails
-- Task 6 Explainability & Responsible AI Report (`reports/explainability_report.md`) featuring global TreeSHAP beeswarm attributions across default/prepayment/delinquency, 5 archetype local waterfall case studies, and False Positive/Negative error diagnostics
-- TreeSHAP explainability engine (`src/explain/explainer.py`)
-- Task 5 Macroeconomic Scenario & Stress Simulation Report (`reports/scenario_report.md`) with portfolio and segment-level (credit band, vintage, state) default and prepayment projections across Base, Adverse Credit, and High Prepayment regimes
+- Complete End-to-End Pipeline Runner (`run_pipeline.py`) orchestrating all 9 phases (0 through 8) in under 75 seconds
+- Final Competition Submission (`submission/submission.csv`) with 6,930 calibrated multi-horizon predictions, anomaly flags, SHAP driver attributions, actions, and confidence scores
+- Enterprise Model Card (`docs/model_card.md` & `model_card.md`) covering architecture, metrics, fair lending (ECOA/Reg B), and operational guidance
+- Task 7 Grounded LLM Reviewer Copilot (`src/copilot/reviewer.py`, `reports/copilot_report.md`, `prompt_log.jsonl`)
+- Task 6 Explainability Layer (`src/explain/explainer.py`, `reports/explainability_report.md`, SHAP figures)
+- Task 5 Scenario & Stress Simulation (`src/scenario/simulator.py`, `reports/scenario_report.md`)
+- Task 4 Anomaly & Exception Engine (`src/anomaly/`, `reports/anomaly_report.md`)
+- Task 3 Time-to-Event Survival Engine (`src/survival/`, `reports/survival_report.md`)
+- Task 2 Predictive Modeling Suite (`src/models/`, `reports/model_comparison.md`)
+- Task 1 Data Intelligence Suite (`src/profiling/`, `reports/data_intelligence_report.md`)
+- Task 0 Project Scaffold & Synthetic Data Engine (`src/data/`)
 - Macroeconomic scenario simulation engine (`src/scenario/simulator.py`) and comparative stress visualization
 - Task 4 Anomaly & Exception Detection Report (`reports/anomaly_report.md`) featuring 25 reviewer-ready case studies with diagnostic plain-English reasoning and remediation prescriptions
 - Hybrid anomaly detection module (`src/anomaly/`) combining 10 deterministic validation rules, servicer tape conflict cross-matching, unsupervised Isolation Forest spatial density scoring, and Random Forest exception classifier
