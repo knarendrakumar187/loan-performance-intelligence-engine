@@ -13,6 +13,84 @@ import plotly.express as px
 import plotly.graph_objects as go
 import streamlit as st
 
+import requests
+
+# ──────────────────────────────────────────────
+# Backend API Configuration
+# ──────────────────────────────────────────────
+BACKEND_URL = "http://127.0.0.1:8000"
+BACKEND_TIMEOUT_SECONDS = 3
+BACKEND_HEALTH_ENDPOINT = f"{BACKEND_URL}/health"
+BACKEND_PREDICT_ENDPOINT = f"{BACKEND_URL}/api/v1/predict/loan"
+BACKEND_REVIEWER_NOTE_ENDPOINT = f"{BACKEND_URL}/api/v1/copilot/review-note"
+
+
+def check_backend_health() -> bool:
+    """Return True if the FastAPI backend is reachable and healthy."""
+    try:
+        resp = requests.get(BACKEND_HEALTH_ENDPOINT, timeout=BACKEND_TIMEOUT_SECONDS)
+        return resp.status_code == 200
+    except requests.exceptions.RequestException:
+        return False
+
+
+def call_backend_predict(sample_dict: dict) -> dict | None:
+    """
+    Send a single loan record to the backend scoring endpoint.
+
+    Expected backend contract (FastAPI):
+        POST /predict
+        body: {...loan fields...}
+        response: {
+            "p_3m_delinquency": float,
+            "p_6m_delinquency": float,
+            "p_12m_default": float,
+            "p_12m_prepayment": float,
+            "next_state": str,
+            "anomaly_score": float
+        }
+
+    Returns None on any network/parsing failure so callers can fall back
+    to local in-process inference.
+    """
+    try:
+        resp = requests.post(
+            BACKEND_PREDICT_ENDPOINT,
+            json=sample_dict,
+            timeout=BACKEND_TIMEOUT_SECONDS,
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except (requests.exceptions.RequestException, ValueError) as e:
+        print(f"[backend] predict call failed, falling back to local models: {e}")
+        return None
+
+
+def call_backend_reviewer_note(row_dict: dict, shap_dict: dict, prediction: dict) -> str | None:
+    """
+    Ask the backend to generate a grounded reviewer note.
+
+    Expected backend contract (FastAPI):
+        POST /reviewer-note
+        body: {"row": {...}, "shap_values": {...}, "prediction": {...}}
+        response: {"note": "markdown string"}
+
+    Returns None on failure so the caller can fall back to the local
+    (in-process) reviewer note generator.
+    """
+    try:
+        resp = requests.post(
+            BACKEND_REVIEWER_NOTE_ENDPOINT,
+            json={"row": row_dict, "shap_values": shap_dict, "prediction": prediction},
+            timeout=BACKEND_TIMEOUT_SECONDS * 3,  # LLM calls may take longer
+        )
+        resp.raise_for_status()
+        return resp.json().get("note")
+    except (requests.exceptions.RequestException, ValueError) as e:
+        print(f"[backend] reviewer-note call failed, falling back to local generator: {e}")
+        return None
+
+
 # Setup project path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from src import config
@@ -285,14 +363,21 @@ with st.sidebar:
         label_visibility="collapsed"
     )
 
-    st.markdown("""
+    backend_online = check_backend_health()
+    backend_status_html = (
+        '<span class="stat-val" style="color:#34d399;">🟢 Online</span>'
+        if backend_online
+        else '<span class="stat-val" style="color:#94a3b8;">⚪ Local-only</span>'
+    )
+
+    st.markdown(f"""
     <div class="sidebar-stats-card">
         <div style="font-weight:700;font-size:0.85rem;color:#60a5fa;margin-bottom:6px;">📊 LIVE PORTFOLIO METRICS</div>
         <div class="sidebar-stat-row"><span class="stat-label">Total Panel:</span><span class="stat-val">34,285 Rows</span></div>
         <div class="sidebar-stat-row"><span class="stat-label">Active Loans:</span><span class="stat-val">3,000 Cohorts</span></div>
         <div class="sidebar-stat-row"><span class="stat-label">Default ROC-AUC:</span><span class="stat-val" style="color:#34d399;">0.8168 (+12.6%)</span></div>
         <div class="sidebar-stat-row"><span class="stat-label">DQI Score:</span><span class="stat-val" style="color:#60a5fa;">97.66 / 100</span></div>
-        <div class="sidebar-stat-row"><span class="stat-label">System State:</span><span class="stat-val" style="color:#34d399;">🟢 Online</span></div>
+        <div class="sidebar-stat-row"><span class="stat-label">Scoring Backend:</span>{backend_status_html}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -410,6 +495,11 @@ elif selected_module == "🎯 Real-Time Loan Scoring":
     </div>
     """, unsafe_allow_html=True)
 
+    if backend_online:
+        st.caption("🟢 Connected to scoring backend — predictions will be served via the FastAPI API.")
+    else:
+        st.caption("⚪ Scoring backend unreachable — using local in-process models.")
+
     c1, c2, c3 = st.columns(3)
     with c1:
         st.markdown("#### 💰 Financial Attributes")
@@ -456,23 +546,37 @@ elif selected_module == "🎯 Real-Time Loan Scoring":
             "modification_flag": 0,
         }
 
-        df_single = pd.DataFrame([sample_dict])
-        df_proc = engineer_features(df_single, is_train=False)
+        # Try the remote FastAPI backend first; fall back to local in-process
+        # model inference if it's unavailable or errors out.
+        backend_result = call_backend_predict(sample_dict) if backend_online else None
 
-        for col in feature_cols:
-            if col not in df_proc.columns:
-                df_proc[col] = 0.0
+        if backend_result is not None:
+            p_3m = float(backend_result["p_3m_delinquency"])
+            p_6m = float(backend_result["p_6m_delinquency"])
+            p_def = float(backend_result["p_12m_default"])
+            p_prep = float(backend_result["p_12m_prepayment"])
+            next_st = str(backend_result["next_state"])
+            anom = float(backend_result["anomaly_score"])
+            score_source = "🟢 Backend API"
+        else:
+            df_single = pd.DataFrame([sample_dict])
+            df_proc = engineer_features(df_single, is_train=False)
 
-        X = df_proc[feature_cols].fillna(0).values
+            for col in feature_cols:
+                if col not in df_proc.columns:
+                    df_proc[col] = 0.0
 
-        p_3m = float(models["next_3m_delinquency_flag"].predict_proba(X)[:, 1][0])
-        p_6m = float(models["next_6m_delinquency_flag"].predict_proba(X)[:, 1][0])
-        p_def = float(models["next_12m_default_flag"].predict_proba(X)[:, 1][0])
-        p_prep = float(models["next_12m_prepayment_flag"].predict_proba(X)[:, 1][0])
-        next_st = str(models["next_state"].predict(X)[0])
+            X = df_proc[feature_cols].fillna(0).values
 
-        anom_scores, exc_types, _ = compute_composite_anomaly_scores(df_single)
-        anom = float(anom_scores.iloc[0])
+            p_3m = float(models["next_3m_delinquency_flag"].predict_proba(X)[:, 1][0])
+            p_6m = float(models["next_6m_delinquency_flag"].predict_proba(X)[:, 1][0])
+            p_def = float(models["next_12m_default_flag"].predict_proba(X)[:, 1][0])
+            p_prep = float(models["next_12m_prepayment_flag"].predict_proba(X)[:, 1][0])
+            next_st = str(models["next_state"].predict(X)[0])
+
+            anom_scores, exc_types, _ = compute_composite_anomaly_scores(df_single)
+            anom = float(anom_scores.iloc[0])
+            score_source = "⚪ Local Models"
 
         # Action badge
         if anom >= 0.65 or p_def >= 0.60:
@@ -485,7 +589,11 @@ elif selected_module == "🎯 Real-Time Loan Scoring":
             action_badge = '<span class="badge badge-approve">APPROVE</span>'
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown(f"### 📋 Scoring Result & Triage Recommendation: {action_badge}", unsafe_allow_html=True)
+        st.markdown(
+            f"### 📋 Scoring Result & Triage Recommendation: {action_badge} "
+            f"<span style='font-size:0.8rem;color:#94a3b8;'>({score_source})</span>",
+            unsafe_allow_html=True,
+        )
 
         g1, g2 = st.columns(2)
         with g1:
@@ -680,9 +788,16 @@ elif selected_module == "🤖 Grounded Reviewer Copilot":
             "prepay_prob": p_prep,
             "confidence": "High" if p_def < 0.1 or p_def > 0.8 else "Medium"
         }
-        data_dict = load_data_dictionary()
-        note = generate_reviewer_note_local(row.to_dict(), shap_dict, prediction, data_dict)
 
-        st.markdown("### 📄 Grounded Reviewer Note Output")
+        # Try the backend LLM note-generation endpoint first; fall back to
+        # the local, in-process grounded generator if it's unavailable.
+        note = call_backend_reviewer_note(row.to_dict(), shap_dict, prediction) if backend_online else None
+        note_source = "🟢 Backend API" if note else "⚪ Local Generator"
+
+        if note is None:
+            data_dict = load_data_dictionary()
+            note = generate_reviewer_note_local(row.to_dict(), shap_dict, prediction, data_dict)
+
+        st.markdown(f"### 📄 Grounded Reviewer Note Output <span style='font-size:0.8rem;color:#94a3b8;'>({note_source})</span>", unsafe_allow_html=True)
         st.markdown(note)
         st.success("🔒 Anti-Hallucination Verified: 100% of risk claims cite numerical TreeSHAP values.")
