@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg-info/
+*.egg
+dist/
+build/
+.eggs/
+
+# Virtual environments
+.env
+.venv/
+env/
+venv/
+
+# Data files (large files, raw data)
+data/raw/*.csv
+data/raw/*.parquet
+data/processed/*.csv
+data/processed/*.parquet
+*.h5
+*.hdf5
+
+# Model checkpoints and artifacts
+checkpoints/
+*.pkl
+*.joblib
+*.onnx
+*.pt
+*.pth
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Reports - keep markdown, ignore generated assets selectively
+reports/figures/*.png
+reports/figures/*.jpg
+
+# Logs
+*.log
+prompt_log.jsonl
+
+# Misc
+*.bak
+*.tmp
