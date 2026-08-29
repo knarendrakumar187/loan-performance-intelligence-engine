@@ -15,21 +15,11 @@ build/
 env/
 venv/
 
-# Data files (large files, raw data)
-data/raw/*.csv
-data/raw/*.parquet
-data/processed/*.csv
+# Large temporary datasets (processed cache)
 data/processed/*.parquet
 *.h5
 *.hdf5
 
-# Model checkpoints and artifacts
-checkpoints/
-*.pkl
-*.joblib
-*.onnx
-*.pt
-*.pth
 
 # Jupyter
 .ipynb_checkpoints/

@@ -1,0 +1,4 @@
+scenario_name,description,credit_score_shift,interest_rate_shift,default_rate_multiplier,prepayment_rate_multiplier
+base,Current economic conditions maintained,0,0.0,1.0,1.0
+adverse_credit,Credit tightening with higher defaults,-1,1.5,2.0,0.6
+high_prepayment,Rate drop driving heavy refinancing activity,0,-1.0,0.8,2.5

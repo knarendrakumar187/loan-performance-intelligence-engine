@@ -136,6 +136,27 @@ def load_datasets():
     return load_train(), load_test(), load_macro_scenarios()
 
 
+@st.cache_data(show_spinner=False)
+def get_cached_anomaly_cases():
+    """Compute and cache anomaly case studies with zero CPU on re-renders."""
+    from src.data.loader import load_train
+    from src.anomaly.explainer import generate_anomaly_explanations
+    from src.anomaly.ml_scorer import compute_composite_anomaly_scores
+    train_data = load_train()
+    scores, exc_types, rules_df = compute_composite_anomaly_scores(train_data)
+    return generate_anomaly_explanations(train_data, scores, exc_types, rules_df, top_n=30)
+
+
+@st.cache_resource(show_spinner=False)
+def get_shap_explainer(model):
+    """Cache TreeExplainer instance."""
+    import shap
+    base_est = model
+    if hasattr(base_est, "calibrated_classifiers_"):
+        base_est = base_est.calibrated_classifiers_[0].estimator
+    return shap.TreeExplainer(base_est)
+
+
 # Load dependencies
 models, feature_cols = ensure_environment_and_models()
 train_df, test_df, macro_df = load_datasets()
@@ -433,11 +454,7 @@ elif selected_module == "🚨 Anomaly & Exception Scanner":
     </div>
     """, unsafe_allow_html=True)
 
-    from src.anomaly.explainer import generate_anomaly_explanations
-    from src.anomaly.ml_scorer import compute_composite_anomaly_scores
-
-    scores, exc_types, rules_df = compute_composite_anomaly_scores(train_df)
-    anomaly_cases = generate_anomaly_explanations(train_df, scores, exc_types, rules_df, top_n=30)
+    anomaly_cases = get_cached_anomaly_cases()
 
     col1, col2 = st.columns([1, 3])
     with col1:
@@ -533,12 +550,7 @@ elif selected_module == "🤖 Grounded Reviewer Copilot":
         p_def = float(models["next_12m_default_flag"].predict_proba(X)[:, 1][0])
         p_prep = float(models["next_12m_prepayment_flag"].predict_proba(X)[:, 1][0])
 
-        base_est = models["next_12m_default_flag"]
-        if hasattr(base_est, "calibrated_classifiers_"):
-            base_est = base_est.calibrated_classifiers_[0].estimator
-
-        import shap
-        explainer = shap.TreeExplainer(base_est)
+        explainer = get_shap_explainer(models["next_12m_default_flag"])
         shap_vals = explainer.shap_values(X)[0]
         shap_dict = {feature_cols[i]: float(shap_vals[i]) for i in range(len(feature_cols))}
 
