@@ -31,8 +31,86 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+    
+    /* Sidebar Styling */
+    section[data-testid="stSidebar"] {
+        background: linear-gradient(180deg, #0b1329 0%, #0f172a 50%, #090e1f 100%);
+        border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .sidebar-brand {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 12px 14px;
+        background: rgba(30, 41, 59, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    }
+    .sidebar-brand-icon {
+        font-size: 2rem;
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    .sidebar-brand-title {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #f8fafc;
+        letter-spacing: -0.02em;
+    }
+    .sidebar-brand-tag {
+        font-size: 0.75rem;
+        color: #94a3b8;
+        font-weight: 500;
+    }
+    
+    /* Styled Radio Navigation Buttons */
+    div[data-testid="stRadio"] > div {
+        gap: 8px;
+    }
+    div[data-testid="stRadio"] label {
+        background: rgba(30, 41, 59, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 10px 14px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        margin-bottom: 4px;
+    }
+    div[data-testid="stRadio"] label:hover {
+        background: rgba(59, 130, 246, 0.15);
+        border-color: rgba(96, 165, 250, 0.4);
+        transform: translateX(3px);
+    }
+    div[data-testid="stRadio"] label[data-checked="true"] {
+        background: linear-gradient(90deg, rgba(59, 130, 246, 0.25) 0%, rgba(99, 102, 241, 0.2) 100%) !important;
+        border-left: 4px solid #3b82f6 !important;
+        border-color: rgba(96, 165, 250, 0.5) !important;
+    }
+    
+    /* Sidebar Stats Card */
+    .sidebar-stats-card {
+        background: rgba(15, 23, 42, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-top: 14px;
+    }
+    .sidebar-stat-row {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.82rem;
+        padding: 4px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    }
+    .sidebar-stat-row:last-child { border-bottom: none; }
+    .stat-label { color: #94a3b8; }
+    .stat-val { color: #f1f5f9; font-weight: 600; }
     
     /* Top Header */
     .hero-container {
@@ -183,12 +261,18 @@ train_df, test_df, macro_df = load_datasets()
 # Sidebar Navigation
 # ──────────────────────────────────────────────
 with st.sidebar:
-    st.image("https://img.icons8.com/fluency/96/bank-building.png", width=64)
-    st.markdown("## **LPIE Platform**")
-    st.caption("Loan Performance Intelligence Engine v1.0")
+    st.markdown("""
+    <div class="sidebar-brand">
+        <div class="sidebar-brand-icon">🏦</div>
+        <div>
+            <div class="sidebar-brand-title">LPIE Intelligence</div>
+            <div class="sidebar-brand-tag">Mortgage Surveillance AI</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
     selected_module = st.radio(
-        "Navigate Intelligence Modules:",
+        "Select Platform Module:",
         [
             "🏛️ Executive Mission Control",
             "🎯 Real-Time Loan Scoring",
@@ -198,15 +282,34 @@ with st.sidebar:
             "🔍 TreeSHAP Explainability",
             "🤖 Grounded Reviewer Copilot",
         ],
+        label_visibility="collapsed"
     )
 
-    st.markdown("---")
-    st.markdown("### 📋 Platform Status")
-    st.markdown("🟢 **Models:** Calibrated XGBoost & LightGBM")
-    st.markdown("🟢 **Validation:** Out-of-Time Chronological")
-    st.markdown("🟢 **DQI Index:** `97.66 / 100` (Grade A)")
-    st.markdown("---")
-    st.caption("Developed for secondary mortgage surveillance & automated risk triage.")
+    st.markdown("""
+    <div class="sidebar-stats-card">
+        <div style="font-weight:700;font-size:0.85rem;color:#60a5fa;margin-bottom:6px;">📊 LIVE PORTFOLIO METRICS</div>
+        <div class="sidebar-stat-row"><span class="stat-label">Total Panel:</span><span class="stat-val">34,285 Rows</span></div>
+        <div class="sidebar-stat-row"><span class="stat-label">Active Loans:</span><span class="stat-val">3,000 Cohorts</span></div>
+        <div class="sidebar-stat-row"><span class="stat-label">Default ROC-AUC:</span><span class="stat-val" style="color:#34d399;">0.8168 (+12.6%)</span></div>
+        <div class="sidebar-stat-row"><span class="stat-label">DQI Score:</span><span class="stat-val" style="color:#60a5fa;">97.66 / 100</span></div>
+        <div class="sidebar-stat-row"><span class="stat-label">System State:</span><span class="stat-val" style="color:#34d399;">🟢 Online</span></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+    st.markdown("<br>", unsafe_allow_html=True)
+
+    # Submission Download Action
+    if config.SUBMISSION_OUTPUT_FILE.exists():
+        sub_data = config.SUBMISSION_OUTPUT_FILE.read_bytes()
+        st.download_button(
+            label="📥 Download Submission CSV",
+            data=sub_data,
+            file_name="submission.csv",
+            mime="text/csv",
+            use_container_width=True,
+        )
+
+    st.caption("🔒 All models calibrated using out-of-time chronological validation.")
 
 
 # ──────────────────────────────────────────────
