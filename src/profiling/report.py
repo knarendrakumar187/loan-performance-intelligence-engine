@@ -41,7 +41,7 @@ def generate_report():
     # 3. Construct Markdown Report
     with open(report_path, "w", encoding="utf-8") as f:
         f.write("# Task 1: Data Intelligence & Profiling Report\n\n")
-        f.write("**Challenge:** Intain Campus FinTech Challenge 2026 | AI Track  \n")
+        f.write("**Challenge:** FinTech AI Challenge | AI Track  \n")
         f.write(f"**Dataset Dimensions:** Train = {len(train_df):,} rows × {train_df.shape[1]} columns | Test = {len(test_df):,} rows × {test_df.shape[1]} columns  \n")
         f.write(f"**Observation Period:** {train_df['reporting_month'].min()} to {train_df['reporting_month'].max()} (Train) vs {test_df['reporting_month'].min()} to {test_df['reporting_month'].max()} (Test)\n\n")
 

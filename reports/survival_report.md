@@ -1,6 +1,6 @@
 # Task 3: Time-to-Event & Competing Risks Survival Modeling Report
 
-**Challenge:** Intain Campus FinTech Challenge 2026 | AI Track  
+**Challenge:** FinTech AI Challenge | AI Track  
 **Dataset Scope:** 3,000 Unique Origination Loan Cohorts  
 **Observation Window:** 1 to 36 Months on Book (Seasoning Duration)  
 

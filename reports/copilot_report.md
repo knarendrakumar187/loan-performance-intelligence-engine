@@ -1,6 +1,6 @@
 # Task 7: Grounded LLM Reviewer Copilot Report
 
-**Challenge:** Intain Campus FinTech Challenge 2026 | AI Track  
+**Challenge:** FinTech AI Challenge | AI Track  
 **Grounding Sources:** Data Dictionary + TreeSHAP Feature Attribution + Model Calibration Confidence  
 **Prompt Audit Log:** `prompt_log.jsonl` (8 entries)  
 
@@ -26,7 +26,7 @@ The Reviewer Copilot generates structured credit review notes that are **strictl
 ## 2. Generated Reviewer Notes (5 Loan Case Studies)
 
 ## Reviewer Note — Loan `LN000421`
-**Generated:** 2026-08-29T13:27:14.445094+00:00  
+**Generated:** 2026-08-29T13:34:27.076396+00:00  
 **Status:** N/A | **DPD:** 0 | **Balance:** $154,151.05 / $157,084.00  
 **Credit Band:** N/A
 
@@ -53,7 +53,7 @@ All required data fields are present. No data gap warnings.
 ---
 
 ## Reviewer Note — Loan `LN000308`
-**Generated:** 2026-08-29T13:27:14.620935+00:00  
+**Generated:** 2026-08-29T13:34:27.156437+00:00  
 **Status:** N/A | **DPD:** 0 | **Balance:** $299,036.96 / $306,062.00  
 **Credit Band:** N/A
 
@@ -80,7 +80,7 @@ Data unavailable for: next_3m_delinquency_flag, next_6m_delinquency_flag, next_1
 ---
 
 ## Reviewer Note — Loan `LN001626`
-**Generated:** 2026-08-29T13:27:15.036658+00:00  
+**Generated:** 2026-08-29T13:34:27.416805+00:00  
 **Status:** N/A | **DPD:** 0 | **Balance:** $473,859.12 / $476,762.00  
 **Credit Band:** N/A
 
@@ -107,7 +107,7 @@ Data unavailable for: next_3m_delinquency_flag, next_6m_delinquency_flag, next_1
 ---
 
 ## Reviewer Note — Loan `LN000688`
-**Generated:** 2026-08-29T13:27:15.214960+00:00  
+**Generated:** 2026-08-29T13:34:27.495615+00:00  
 **Status:** N/A | **DPD:** 0 | **Balance:** $143,336.19 / $144,694.00  
 **Credit Band:** N/A
 
@@ -134,7 +134,7 @@ All required data fields are present. No data gap warnings.
 ---
 
 ## Reviewer Note — Loan `LN001349`
-**Generated:** 2026-08-29T13:27:15.406663+00:00  
+**Generated:** 2026-08-29T13:34:27.571484+00:00  
 **Status:** N/A | **DPD:** 0 | **Balance:** $234,980.66 / $237,318.00  
 **Credit Band:** N/A
 

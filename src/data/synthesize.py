@@ -2,7 +2,7 @@
 Synthetic Data Generator for the Loan Performance Intelligence Engine.
 
 Generates development-scale datasets matching the exact schemas from the
-Intain Campus FinTech Challenge 2026 problem statement (Section 7).
+FinTech AI Challenge problem statement (Section 7).
 
 The generator produces realistic loan-level monthly performance data with:
 - Correlated features (e.g., higher LTV → higher default risk)

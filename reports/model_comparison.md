@@ -1,6 +1,6 @@
 # Task 2: Loan Performance Predictive Modeling Report
 
-**Challenge:** Intain Campus FinTech Challenge 2026 | AI Track  
+**Challenge:** FinTech AI Challenge | AI Track  
 **Evaluation Methodology:** Strict Time-Aware Chronological Out-of-Time Validation  
 **Train Period:** 2022-01 to 2023-10 (`20,015` records, 73.2%)  
 **Validation Period:** 2023-11 to 2024-04 (`7,340` records, 26.8%)  

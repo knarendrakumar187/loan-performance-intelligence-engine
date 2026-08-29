@@ -1,6 +1,6 @@
 # Task 4: Anomaly & Exception Detection Report
 
-**Challenge:** Intain Campus FinTech Challenge 2026 | AI Track  
+**Challenge:** FinTech AI Challenge | AI Track  
 **Portfolio Analyzed:** 27,355 monthly loan performance records  
 **Detection Framework:** Hybrid Rule-Based (10 deterministic checks) + Unsupervised Spatial ML (Isolation Forest) + Supervised Exception Classification
 

@@ -1,6 +1,6 @@
 # Task 5: Macroeconomic Scenario & Stress Simulation Report
 
-**Challenge:** Intain Campus FinTech Challenge 2026 | AI Track  
+**Challenge:** FinTech AI Challenge | AI Track  
 **Simulation Scope:** Full Portfolio Stress Testing under 3 Macroeconomic Regimes  
 **Models Ingested:** Calibrated XGBoost Performance Models  
 

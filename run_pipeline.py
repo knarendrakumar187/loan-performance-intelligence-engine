@@ -129,7 +129,7 @@ def main():
 
     print("=" * 60)
     print("Loan Performance Intelligence Engine")
-    print("Intain Campus FinTech Challenge 2026 — AI Track")
+    print("FinTech AI Challenge — AI Track")
     print("=" * 60)
 
     ensure_directories()

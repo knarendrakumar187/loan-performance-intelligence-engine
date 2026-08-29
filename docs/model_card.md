@@ -1,7 +1,7 @@
 # Model Card: Loan Performance Intelligence Engine
 
 **Model Name:** Loan Performance Intelligence Engine (LPIE-v1.0)  
-**Challenge Track:** Intain Campus FinTech Challenge 2026 — AI Track  
+**Challenge Track:** FinTech AI Challenge — AI Track  
 **Date:** August 2026  
 **License:** Apache 2.0  
 **Authors:** Hackathon Engineering Team  

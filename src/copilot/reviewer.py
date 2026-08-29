@@ -386,7 +386,7 @@ def run_copilot() -> None:
     # 4. Write Markdown Report
     with open(report_path, "w", encoding="utf-8") as f:
         f.write("# Task 7: Grounded LLM Reviewer Copilot Report\n\n")
-        f.write("**Challenge:** Intain Campus FinTech Challenge 2026 | AI Track  \n")
+        f.write("**Challenge:** FinTech AI Challenge | AI Track  \n")
         f.write("**Grounding Sources:** Data Dictionary + TreeSHAP Feature Attribution + Model Calibration Confidence  \n")
         f.write(f"**Prompt Audit Log:** `prompt_log.jsonl` ({len(generated_notes) + len(rejections)} entries)  \n\n")
 

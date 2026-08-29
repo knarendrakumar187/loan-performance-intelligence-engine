@@ -1,7 +1,7 @@
 # AI Development Log
 
 **Project:** Loan Performance Intelligence Engine
-**Challenge:** Intain Campus FinTech Challenge 2026 — AI Track
+**Challenge:** FinTech AI Challenge — AI Track
 
 This log documents all AI tool usage throughout the development of this project, as required by Task 8 of the problem statement.
 

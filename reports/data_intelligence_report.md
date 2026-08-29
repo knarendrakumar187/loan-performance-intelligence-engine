@@ -1,6 +1,6 @@
 # Task 1: Data Intelligence & Profiling Report
 
-**Challenge:** Intain Campus FinTech Challenge 2026 | AI Track  
+**Challenge:** FinTech AI Challenge | AI Track  
 **Dataset Dimensions:** Train = 27,355 rows × 33 columns | Test = 6,930 rows × 26 columns  
 **Observation Period:** 2022-01 to 2024-04 (Train) vs 2024-05 to 2026-11 (Test)
 

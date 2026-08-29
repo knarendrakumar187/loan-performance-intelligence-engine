@@ -35,7 +35,7 @@ def run_anomaly_detection() -> pd.DataFrame:
     # 5. Write Markdown Report
     with open(report_path, "w", encoding="utf-8") as f:
         f.write("# Task 4: Anomaly & Exception Detection Report\n\n")
-        f.write("**Challenge:** Intain Campus FinTech Challenge 2026 | AI Track  \n")
+        f.write("**Challenge:** FinTech AI Challenge | AI Track  \n")
         f.write(f"**Portfolio Analyzed:** {len(train_df):,} monthly loan performance records  \n")
         f.write(f"**Detection Framework:** Hybrid Rule-Based (10 deterministic checks) + Unsupervised Spatial ML (Isolation Forest) + Supervised Exception Classification\n\n")
 

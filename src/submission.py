@@ -1,5 +1,5 @@
 """
-Submission generation script for Intain Campus FinTech Challenge 2026.
+Submission generation script for FinTech AI Challenge.
 Produces submission/submission.csv with calibrated model predictions, anomaly flags,
 and explainability outputs for the test dataset.
 """

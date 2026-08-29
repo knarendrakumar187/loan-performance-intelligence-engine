@@ -173,7 +173,7 @@ def run_scenario_simulation() -> Tuple[pd.DataFrame, pd.DataFrame]:
     # 4. Generate Markdown Report
     with open(report_path, "w", encoding="utf-8") as f:
         f.write("# Task 5: Macroeconomic Scenario & Stress Simulation Report\n\n")
-        f.write("**Challenge:** Intain Campus FinTech Challenge 2026 | AI Track  \n")
+        f.write("**Challenge:** FinTech AI Challenge | AI Track  \n")
         f.write(f"**Simulation Scope:** Full Portfolio Stress Testing under 3 Macroeconomic Regimes  \n")
         f.write(f"**Models Ingested:** Calibrated XGBoost Performance Models  \n\n")
 

@@ -1,6 +1,6 @@
 # Task 6: Explainability & Responsible AI Report
 
-**Challenge:** Intain Campus FinTech Challenge 2026 | AI Track  
+**Challenge:** FinTech AI Challenge | AI Track  
 **Explainability Methodology:** Model-Agnostic Shapley Additive Explanations (TreeSHAP)  
 **Evaluation Scope:** Global Feature Attribution, Local Loan Profiles, Error Breakdown, and Uncertainty Bounds
 
