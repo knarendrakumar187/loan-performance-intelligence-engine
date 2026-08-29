@@ -88,14 +88,14 @@ def phase_6_explain():
 
 def phase_7_copilot():
     """Phase 7: LLM-assisted reviewer copilot."""
-    from src.copilot.reviewer import run_copilot_demo
-    run_copilot_demo()
+    from src.copilot.reviewer import run_copilot
+    run_copilot()
     print("[✓] Phase 7: Copilot demo complete")
 
 
 def phase_8_submission():
     """Phase 8: Generate final submission."""
-    from src.models.submission import generate_submission
+    from src.submission import generate_submission
     generate_submission()
     print("[✓] Phase 8: Submission generated")
 
