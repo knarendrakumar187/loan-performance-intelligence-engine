@@ -38,6 +38,9 @@ MODELS = {}
 FEATURE_COLS = []
 
 
+@app.get("/")
+def api_root():
+    return {"status": "ok", "docs": "/docs"}
 @app.on_event("startup")
 def load_models():
     """Load model checkpoints into memory at startup."""
