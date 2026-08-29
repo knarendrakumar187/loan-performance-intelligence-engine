@@ -77,7 +77,11 @@ def compute_composite_anomaly_scores(
     rules_df, rule_scores = evaluate_business_rules(df)
 
     # 2. ML Isolation Forest score (normalized to [0, 1])
-    X = df[[c for c in feat_cols if c in df.columns]].fillna(0).values
+    df_eval = df.copy()
+    for col in feat_cols:
+        if col not in df_eval.columns:
+            df_eval[col] = 0.0
+    X = df_eval[feat_cols].fillna(0).values
     # Invert decision function: lower score = more anomalous
     raw_decision = iso_forest.decision_function(X)
     ml_scores = 1.0 - (raw_decision - raw_decision.min()) / (raw_decision.max() - raw_decision.min() + 1e-8)
