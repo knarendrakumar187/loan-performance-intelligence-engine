@@ -176,12 +176,36 @@ cd loan-performance-intelligence-engine
 pip install -r requirements.txt
 ```
 
-### Run Full Pipeline End-to-End (One Command)
+### Run Full Pipeline End-to-End (Batch Mode)
 
 ```bash
 # Executes Phases 0 through 8 in ~65 seconds
 python run_pipeline.py
 ```
+
+### Launch Interactive Web Dashboard (UI Mode)
+
+```bash
+# Start Streamlit Web UI
+streamlit run app.py
+```
+*Visit `http://localhost:8501` to access the live interactive dashboard with single-loan scoring, TreeSHAP waterfalls, stress testing, and copilot generation.*
+
+### Launch Production FastAPI REST Server (API Mode)
+
+```bash
+# Start REST API microservice
+uvicorn src.api.server:app --host 0.0.0.0 --port 8000 --reload
+```
+*Visit `http://localhost:8000/docs` for interactive Swagger API documentation.*
+
+### Docker 1-Command Container Deployment
+
+```bash
+# Run both Web Dashboard and REST API via Docker Compose
+docker-compose up -d
+```
+*See [`docs/deployment_guide.md`](docs/deployment_guide.md) for full instructions on deploying to Streamlit Cloud, Hugging Face Spaces, Render, AWS, and GCP.*
 
 ### Modular Execution by Phase
 
