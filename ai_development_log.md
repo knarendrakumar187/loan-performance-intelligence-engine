@@ -114,4 +114,43 @@ Build the complete data profiling module covering:
 ### Lessons Learned
 - Visualizing distribution drift (e.g. `loan_age_months` naturally drifting as cohorts mature) provides vital context: demographic features remain stable (PSI < 0.05) while age features reflect temporal progression.
 
+---
+
+## Session 4 — Task 2: Loan Performance Predictive Modeling (2026-08-29)
+
+### AI Tool Used
+- **Model:** Gemini 3.7 Flash
+- **Subagents:** `codewriter` (Pro model)
+- **Purpose:** Leakage-safe feature engineering, automated correlation audit, time-aware chronological validation, baseline Logistic Regression, calibrated XGBoost/LightGBM model training, and performance comparison reporting.
+
+### Representative Prompt
+```
+Build the complete predictive modeling pipeline for Task 2 (20 pts):
+- Engineer domain features (ratios, delinquency indicators, risk index, seasoning)
+- Run automated target leakage audit (correlation threshold > 0.90 check)
+- Strict chronological time-aware split (2022-01 to 2023-10 train, 2023-11 to 2024-04 val)
+- Train baseline Logistic Regression with StandardScaler
+- Train improved Calibrated XGBoost with scale_pos_weight for all binary targets
+- Train LightGBM multiclass classifier for next_state
+- Output reports/model_comparison.md and calibration reliability curves
+```
+
+### What Was Accepted
+- Strict time-aware splitting preventing cross-cohort multi-record loan leakage across folds.
+- Cost-sensitive `scale_pos_weight` weighting coupled with 3-fold Platt probability calibration.
+- Reaching **0.8168 ROC-AUC on 12M Default** and **0.7119 ROC-AUC on Prepayment**.
+- Side-by-side metric comparison table covering ROC-AUC, PR-AUC, F1, Brier Score, and Recall@80% precision.
+
+### What Was Rejected / Modified
+- Dropped raw categorical strings (`credit_score_band`, etc.) in favor of ordinal numeric risk tiers (`credit_risk_tier`, etc.) to prevent string-to-float conversion errors in scikit-learn models.
+- Standardized linear features via `StandardScaler` in baseline pipeline to prevent L-BFGS convergence failures.
+- Computed precision-recall curve threshold optimization alongside standard 0.50 cutoff for heavily imbalanced default labels.
+
+### Approximate AI-Generated Code Share
+- ~92% AI-generated, 8% human tuning of hyperparameter bounds and threshold evaluation
+
+### Lessons Learned
+- Default prediction in financial panels benefits disproportionately from non-linear interaction terms and Platt calibration, reducing Brier calibration error by over 43% relative to uncalibrated baselines.
+
+
 
