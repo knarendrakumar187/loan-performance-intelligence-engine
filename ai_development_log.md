@@ -248,6 +248,62 @@ Build the scenario and stress simulation engine for Task 5 (10 pts):
 ### Lessons Learned
 - Feeding feature-level economic shocks through calibrated non-linear models uncovers segment-specific vulnerabilities (e.g., subprime cohorts suffering disproportionately higher default spikes) compared to naive linear portfolio multipliers.
 
+---
+
+## Session 8 — Task 6: Explainability Layer & Error Analysis (2026-08-29)
+
+### AI Tool Used
+- **Model:** Gemini 3.7 Flash & Claude Opus 4.6
+- **Purpose:** Model-agnostic TreeSHAP feature attribution (global summary beeswarm plots for default, prepayment, delinquency), 5 local loan archetype waterfall case studies, and False Positive/Negative error diagnostics.
+
+### Representative Prompt
+```
+Build the explainability layer for Task 6 (10 pts):
+- Compute TreeSHAP values for XGBoost default, prepayment, and delinquency models
+- Generate global feature attribution beeswarm plots
+- Extract 5 local loan case studies (True Positive, True Negative, False Positive, False Negative, Prepayment)
+- Perform False Positive vs False Negative error diagnostics
+- Compute binned prediction uncertainty and calibration error
+- Output reports/explainability_report.md
+```
+
+### What Was Accepted
+- Identification of top global default risk drivers: `days_past_due`, `balance_to_orig_ratio`, `combined_risk_index`, and `monthly_interest_accrual`.
+- Error diagnostic finding: False Positives are driven by high coupon rates mitigated by unmodeled loan seasoning; False Negatives are driven by sudden un-seasoned liquidity shocks among prime borrowers.
+
+### Approximate AI-Generated Code Share
+- ~94% AI-generated, 6% human domain review
+
+---
+
+## Session 9 — Task 7: Grounded LLM Reviewer Copilot (2026-08-29)
+
+### AI Tool Used
+- **Model:** Gemini 3.7 Flash & Claude Opus 4.6
+- **Purpose:** Strict grounding prompt construction, template-driven deterministic note generation, audit logging to `prompt_log.jsonl`, and 3 explicit rejection/correction examples demonstrating anti-hallucination guardrails.
+
+### Representative Prompt
+```
+Build the Grounded LLM Reviewer Copilot for Task 7 (10 pts):
+- Formulate prompt template strictly grounded in Data Dictionary, TreeSHAP values, and model calibration
+- Implement reviewer note generator with mandatory SHAP citations and action classification
+- Log all prompts and completions to prompt_log.jsonl
+- Provide >= 3 rejection/correction examples (market speculation, borrower intent, missing data imputation)
+- Output reports/copilot_report.md
+```
+
+### What Was Accepted
+- Mandatory citation requirement: every risk claim must explicitly cite a numeric SHAP contribution value.
+- Rejection examples documenting specific guardrail violations and corresponding grounded corrections.
+- Zero-hallucination template engine paired with full audit trail in `prompt_log.jsonl`.
+
+### Approximate AI-Generated Code Share
+- ~90% AI-generated, 10% compliance design
+
+### Lessons Learned
+- Grounding reviewer notes in local TreeSHAP attributions provides quantitative, auditable rationale that eliminates speculative hallucinations while maintaining actionable underwriting recommendations.
+
+
 
 
 

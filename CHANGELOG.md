@@ -6,6 +6,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/).
 ## [Unreleased]
 
 ### Added
+- Task 7 Grounded LLM Reviewer Copilot Report (`reports/copilot_report.md`) with deterministic structured note generator grounded strictly in Data Dictionary, TreeSHAP values, and model confidence, alongside `prompt_log.jsonl` audit trail and 3 rejection/correction examples
+- Copilot module (`src/copilot/reviewer.py`) enforcing hallucination guardrails
+- Task 6 Explainability & Responsible AI Report (`reports/explainability_report.md`) featuring global TreeSHAP beeswarm attributions across default/prepayment/delinquency, 5 archetype local waterfall case studies, and False Positive/Negative error diagnostics
+- TreeSHAP explainability engine (`src/explain/explainer.py`)
 - Task 5 Macroeconomic Scenario & Stress Simulation Report (`reports/scenario_report.md`) with portfolio and segment-level (credit band, vintage, state) default and prepayment projections across Base, Adverse Credit, and High Prepayment regimes
 - Macroeconomic scenario simulation engine (`src/scenario/simulator.py`) and comparative stress visualization
 - Task 4 Anomaly & Exception Detection Report (`reports/anomaly_report.md`) featuring 25 reviewer-ready case studies with diagnostic plain-English reasoning and remediation prescriptions
