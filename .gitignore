@@ -50,7 +50,7 @@ reports/figures/*.jpg
 
 # Logs
 *.log
-prompt_log.jsonl
+# prompt_log.jsonl is tracked for copilot audit trail
 
 # Misc
 *.bak
