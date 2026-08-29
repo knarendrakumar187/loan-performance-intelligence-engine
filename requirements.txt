@@ -21,6 +21,7 @@ shap>=0.45.0
 # Visualization
 matplotlib==3.10.7
 seaborn>=0.13.0
+plotly>=5.18.0
 
 # Web & API Deployment
 streamlit>=1.30.0
